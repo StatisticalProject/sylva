@@ -5,19 +5,48 @@ output: github_document
 
 Start
 ```{r}
- train = read.table("data/sylva_train.data")
- labels = read.table("data/sylva_train.labels")
- table(labels)
- acp.train <- princomp(train, cor = T, scores = T)
- 
+ train.data = read.table("data/sylva_train.data")
+ train.labels = read.table("data/sylva_train.labels")
+ colnames(train.labels)[1] <- "Y"
+ train.full=cbind(train.labels,train.data)
+ table(train.labels)
+ acp.train <- princomp(train.data, center = TRUE,scale. = TRUE)
+ print (acp.train)
+ plot( acp.train , type = "l")
+ plot(1-cumsum(acp.train$sdev^2 / sum(acp.train$sdev^2)))
+ print(1-cumsum(acp.train$sdev^2 / sum(acp.train$sdev^2))) 
  #statistiques descriptives
 summary(train)
 cor(train)
 #nuages de points.
-png("p3_sa_para.png", 4096, 4096)
-pairs(train)
+png("dp3_sa_para.png", 3096, 3096)
+#pairs(train)
 dev.off()
+library(rpart)
+fit <- rpart(Kyphosis ~ Age + Number + Start,
+  	method="class", data=kyphosis)
 
+printcp(fit) # display the results 
+plotcp(fit) # visualize cross-validation results 
+summary(fit) # detailed summary of splits
+
+# plot tree 
+plot(fit, uniform=TRUE, 
+  	main="Classification Tree for Kyphosis")
+text(fit, use.n=TRUE, all=TRUE, cex=.8)
+
+# create attractive postscript plot of tree 
+post(fit, file = "c:/tree.ps", 
+  	title = "Classification Tree for Kyphosis")
+
+library(randomForest)
+iris.rf <- randomForest(Species ~ ., data=iris, importance=TRUE,
+proximity=TRUE)
+iris.p <- classCenter(train, labels, iris.rf$prox)
+plot(iris[,3], iris[,4], pch=21, xlab=names(iris)[3], ylab=names(iris)[4],
+bg=c("red", "blue", "green")[as.numeric(factor(iris$Species))],
+main="Iris Data with Prototypes")
+points(iris.p[,3], iris.p[,4], pch=21, cex=2, bg=c("red", "blue", "green"))
 ```
 
 ```{r setup, include=FALSE}
