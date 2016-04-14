@@ -5,10 +5,11 @@ output: github_document
 
 Start
 ```{r}
- train.data = read.table("data/sylva_train.data")
- train.labels = read.table("data/sylva_train.labels")
+ train.data <- read.table("data/sylva_train.data")
+ train.labels <- read.table("data/sylva_train.labels")
+ train.labels$V1 <- as.factor(train.labels$V1)
  colnames(train.labels)[1] <- "Y"
- train.full=cbind(train.labels,train.data)
+ train.full=(cbind(train.labels,train.data))
  table(train.labels)
  acp.train <- princomp(train.data, center = TRUE,scale. = TRUE)
  print (acp.train)
@@ -40,8 +41,10 @@ post(fit, file = "c:/tree.ps",
   	title = "Classification Tree for Kyphosis")
 
 library(randomForest)
-iris.rf <- randomForest(Species ~ ., data=iris, importance=TRUE,
-proximity=TRUE)
+iris.rf <- randomForest(Y ~ ., data=train.full, importance=TRUE,proximity=TRUE)
+plot(iris.rf, log="y")
+varImpPlot(iris.rf)
+MDSplot(iris.rf, train.full$Y)
 iris.p <- classCenter(train, labels, iris.rf$prox)
 plot(iris[,3], iris[,4], pch=21, xlab=names(iris)[3], ylab=names(iris)[4],
 bg=c("red", "blue", "green")[as.numeric(factor(iris$Species))],
