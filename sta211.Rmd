@@ -18,10 +18,31 @@ Start
  print(1-cumsum(acp.train$sdev^2 / sum(acp.train$sdev^2))) 
  #statistiques descriptives
 summary(train.data)
+
+#dessine correlation
 corMAt<-cor(train.data)
 image(corMAt)
 library(lattice)
 levelplot(corMAt,aspect="iso",pretty=TRUE,xlim=c(1,199), ylim=c(1,199))
+
+#grille de barchart
+install.packages("gridExtra")
+ require(gridExtra) # also loads grid
+ require(lattice)
+ x <- seq(pi/4, 5 * pi, length.out = 100)> y <- seq(pi/4, 5 * pi, length.out = 100)
+ r <- as.vector(sqrt(outer(x^2, y^2, "+")))
+
+ grid <- expand.grid(x=x, y=y)
+ grid$z <- cos(r^2) * exp(-r/(pi^3))
+ plot1 <- levelplot(z~x*y, grid, cuts = 50, scales=list(log="e"), xlab="",
+           ylab="", main="Weird Function", sub="with log scales",
+           colorkey = FALSE, region = TRUE)
+
+ plot2 <- levelplot(z~x*y, grid, cuts = 50, scales=list(log="e"), xlab="",
+           ylab="", main="Weird Function", sub="with log scales",
+           colorkey = FALSE, region = TRUE)
+ grid.arrange(plot1,plot2, ncol=2)
+
 #nuages de points.
 png("dp3_sa_para.png", 3096, 3096)
 #pairs(train)
