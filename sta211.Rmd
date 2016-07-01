@@ -17,8 +17,11 @@ Start
  plot(1-cumsum(acp.train$sdev^2 / sum(acp.train$sdev^2)))
  print(1-cumsum(acp.train$sdev^2 / sum(acp.train$sdev^2))) 
  #statistiques descriptives
-summary(train)
-cor(train)
+summary(train.data)
+corMAt<-cor(train.data)
+image(corMAt)
+library(lattice)
+levelplot(corMAt,aspect="iso",pretty=TRUE,xlim=c(1,199), ylim=c(1,199))
 #nuages de points.
 png("dp3_sa_para.png", 3096, 3096)
 #pairs(train)
