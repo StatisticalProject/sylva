@@ -12,6 +12,8 @@ Start
  train.full=(cbind(train.labels,train.data))
  table(train.labels)
  acp.train <- princomp(train.data, center = TRUE,scale. = TRUE)
+ sdd<-acp.train$sdev
+ t(acp.train$sdev[acp.train$sdev>=1])
  print (acp.train)
  plot( acp.train , type = "l")
  plot(1-cumsum(acp.train$sdev^2 / sum(acp.train$sdev^2)))
