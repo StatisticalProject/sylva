@@ -25,6 +25,14 @@ image(corMAt)
 library(lattice)
 levelplot(corMAt,aspect="iso",pretty=TRUE,xlim=c(1,199), ylim=c(1,199))
 
+graphics.off()
+par(mfrow=c(4,5))
+nb<-ncol(train.data)
+for (i in 1:nb){
+  hist(train.data[,i],main = paste("Variable",i))
+
+}
+
 #grille de barchart
 install.packages("gridExtra")
  require(gridExtra) # also loads grid
