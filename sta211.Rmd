@@ -61,6 +61,7 @@ train.quantQual<-cbind(train.quantRed,train.qualAcm)
 train.full<-(cbind(train.labels,train.quantQual,train.qualAcm))
 
 res.pca = PCA(train.quantQual, scale.unit=FALSE, ncp=ncol(train.quantQual), graph=T)
+res.pca$eig
 
 library(randomForest)
 iris.rf <- randomForest(Y ~ ., data=train.full, importance=TRUE,proximity=TRUE)
