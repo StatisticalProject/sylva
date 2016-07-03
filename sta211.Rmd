@@ -35,8 +35,11 @@ image(data.matrix(burtd))
 levelplot(data.matrix(burtd),aspect="iso",pretty=TRUE,xlim=c(1,199), ylim=c(1,199))
 train.qualAcm$cr
 
-library(FactoMiner)
-
+library(FactoMineR)
+mca<-MCA(train.quali,ncp=ncol(train.quali))
+train.qualAcm<-mca$ind$coord
+print(mca)
+summary(mca)
 #dessine correlation
 corMAt<-cor(train.quant)
 image(corMAt)
@@ -51,7 +54,13 @@ for (i in 1:nb){
 
 }
 
+#mat
+train.quantRed<-scale(train.quant,center = TRUE,scale = TRUE)[,1]
 
+train.quantQual<-cbind(train.quantRed,train.qualAcm)
+train.full<-(cbind(train.labels,train.quantQual,train.qualAcm))
+
+res.pca = PCA(train.quantQual, scale.unit=FALSE, ncp=ncol(train.quantQual), graph=T)
 
 library(randomForest)
 iris.rf <- randomForest(Y ~ ., data=train.full, importance=TRUE,proximity=TRUE)
