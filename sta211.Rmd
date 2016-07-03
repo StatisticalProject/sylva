@@ -5,6 +5,8 @@ output: github_document
 
 Start
 ```{r}
+require(ade4)
+
  train.data <- read.table("data/sylva_train.data")
  train.labels <- read.table("data/sylva_train.labels")
  train.labels$V1 <- as.factor(train.labels$V1)
@@ -20,12 +22,26 @@ Start
  print(1-cumsum(acp.train$sdev^2 / sum(acp.train$sdev^2))) 
  #statistiques descriptives
 summary(train.data)
+train.quali<-train.data[,c(1,2,4:6,8,9,11:17,19:40,44:49,51:54,56:74,77:80,82:87,90:99,101:103,106:109,111,112,114:116,118:124,128:138,140:142,144:146,148,149,151:154,156:165,167:170,172:178,180,181,184:186,189,190,192:200,202:204,206,207,209,210,212:216)]
+train.quant<-train.data[,c(3,7,10,18,41,42,43,50,55,75,76,81,88,89,100,104,105,110,113,117,125,126,127,139,143,147,150,155,166,171,179,182,183,187,188,191,201,205,208,211)]
+ncol(train.quali)+ncol(train.quant)
+ncol(train.data)
+for(i in 1:ncol(train.quali)){
+    train.quali[,i]=as.factor(train.quali[,i])
+}
+train.qualAcm<-dudi.acm(train.quali,nf=ncol(train.quali),scannf = FALSE)
+burtd<-acm.burt(train.quali,train.quali)
+image(data.matrix(burtd))
+levelplot(data.matrix(burtd),aspect="iso",pretty=TRUE,xlim=c(1,199), ylim=c(1,199))
+train.qualAcm$cr
+
+library(FactoMiner)
 
 #dessine correlation
-corMAt<-cor(train.data)
+corMAt<-cor(train.quant)
 image(corMAt)
 library(lattice)
-levelplot(corMAt,aspect="iso",pretty=TRUE,xlim=c(1,199), ylim=c(1,199))
+levelplot(corMAt,aspect="iso",pretty=TRUE,xlim=c(1,ncol(train.quant)), ylim=c(1,ncol(train.quant)))
 
 graphics.off()
 par(mfrow=c(4,5))
