@@ -81,3 +81,4 @@ table(train.test$Y, predict(dataTreeSimple, cbind(train.test[,1],newValue$lisup[
 
 train.rf <- randomForest(Y ~ ., data=train.full, importance=TRUE,proximity=TRUE)
 Prediction <- predict(train.rf, newFull)
+table(train.test$Y,Prediction)
