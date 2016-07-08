@@ -63,6 +63,7 @@ for(i in 1:ncol(train.data)){
 
 
 train.full<-(cbind(train.labels,train.qualAcm$li[,1:kaiserLimitCol]))
+train.full[,1]<-as.integer(train.full[,1])
 colnames(train.full)[1] <- "Y"
 dataTree <- rpart(Y ~ ., data=train.full)
 plotcp(dataTree)
@@ -86,6 +87,8 @@ table(train.full$Y,Prediction)
 
 n <- names(train.full)
 f <- as.formula(paste("Y ~", paste(n[!n %in% "Y"], collapse = " + ")))
-train.full[,1]<-as.numeric(train.full[,1])
+train.full[,1]<-as.integer(train.full[,1])
+
 nn <- neuralnet(f, data=train.full,hidden=c(5,3),linear.output=T)
 plot(nn)
+pr.nn <- compute(nn,newFull)
