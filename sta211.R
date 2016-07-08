@@ -73,11 +73,9 @@ table(train.full$Y, predict(dataTreeSimple, train.full, type="class"))
 colnames(train.test)[1] <- "Y"
 train.suprow<-acm.disjonctif(train.test[,2:ncol(train.test)])
 newValue<-suprow(train.qualAcm, train.suprow)
-newFull<-cbind(train.test$Y,newValue$lisup[,1:kaiserLimitCol])
-table(train.test$Y, predict(dataTree, cbind(train.test[,1],newValue$lisup[,1:kaiserLimitCol]), type="class"))
-table(train.test$Y, predict(dataTreeSimple, cbind(train.test[,1],newValue$lisup[,1:kaiserLimitCol]), type="class"))
-
-
+newFull<-cbind(train.test[,1],newValue$lisup[,1:kaiserLimitCol])
+table(train.test$Y, predict(dataTree, newFull, type="class"))
+table(train.test$Y, predict(dataTreeSimple, newFull, type="class"))
 
 train.rf <- randomForest(Y ~ ., data=train.full, importance=TRUE,proximity=TRUE)
 Prediction <- predict(train.rf, newFull)
