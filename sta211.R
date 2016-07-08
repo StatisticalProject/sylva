@@ -33,7 +33,7 @@ train.FullAcm<-cbind(train.qualiFact,train.quali)
 train.full<-cbind(train.labels,train.FullAcm)
 
 set.seed(15) 
-bound <- floor((nrow(train.full)/4)*3)         #define % of training and test set
+bound <- floor(nrow(train.full)*0.7)         #define % of training and test set
 df <- train.full[sample(nrow(train.full)), ]           #sample rows 
 train.learn <- df[1:bound, ]              #get training set
 train.test <- df[(bound+1):nrow(df), ]    #get test set
@@ -80,3 +80,6 @@ table(train.test$Y, predict(dataTreeSimple, newFull, type="class"))
 train.rf <- randomForest(Y ~ ., data=train.full, importance=TRUE,proximity=TRUE)
 Prediction <- predict(train.rf, newFull)
 table(train.test$Y,Prediction)
+Prediction <- predict(train.rf, train.full)
+table(train.full$Y,Prediction)
+
