@@ -10,7 +10,7 @@ train.labels <- read.table("data/sylva_train.labels")
 train.labels$V1 <- as.factor(train.labels$V1)
 colnames(train.labels)[1] <- "Y"
 
-train.full=(cbind(train.labels,train.data))
+#train.full=(cbind(train.labels,train.data))
 
 set.seed(100) 
 
@@ -34,14 +34,16 @@ train.FullAcm<-cbind(train.qualiFact,train.quali)
 train.full<-cbind(train.labels,train.FullAcm)
 
 set.seed(15) 
-bound <- floor(nrow(train.full)*0.7)         #define % of training and test set
+bound <- floor(nrow(train.full)*0.7)         
+bound2<-floor((nrow(train.full)-bound)*2.0/3.0)
 df <- train.full[sample(nrow(train.full)), ]           #sample rows 
 train.learn <- df[1:bound, ]              #get training set
-train.test <- df[(bound+1):nrow(df), ]    #get test set
+train.validation <- df[(bound+1):(bound+bound2), ]    #get test set
+
+train.test <- df[(bound+bound2+1):nrow(df), ]    #get test set
 
 train.FullAcm<-train.learn[,2:ncol(train.full)]
 train.labels<-train.learn[,1]
-
 
 
 train.qualAcm<-dudi.acm(train.FullAcm,nf=ncol(train.FullAcm),scannf = FALSE)
@@ -63,7 +65,7 @@ for(i in 1:ncol(train.data)){
 
 
 train.full<-(cbind(train.labels,train.qualAcm$li[,1:kaiserLimitCol]))
-train.full[,1]<-as.integer(train.full[,1])
+
 colnames(train.full)[1] <- "Y"
 dataTree <- rpart(Y ~ ., data=train.full)
 plotcp(dataTree)
@@ -74,6 +76,8 @@ table(train.full$Y, predict(dataTree, train.full, type="class"))
 table(train.full$Y, predict(dataTreeSimple, train.full, type="class"))
 colnames(train.test)[1] <- "Y"
 train.suprow<-acm.disjonctif(train.test[,2:ncol(train.test)])
+colw <- train.qualAcm$cw*ncol(train.FullAcm)
+train.suprow <- data.frame(t(t(train.suprow)/colw) - 1)
 newValue<-suprow(train.qualAcm, train.suprow)
 newFull<-cbind(train.test[,1],newValue$lisup[,1:kaiserLimitCol])
 table(train.test$Y, predict(dataTree, newFull, type="class"))
@@ -86,9 +90,37 @@ Prediction <- predict(train.rf, train.full)
 table(train.full$Y,Prediction)
 
 n <- names(train.full)
-f <- as.formula(paste("Y ~", paste(n[!n %in% "Y"], collapse = " + ")))
-train.full[,1]<-as.integer(train.full[,1])
+f <- as.formula(paste("Y1 + Y2 ~", paste(n[!n %in% "Y"], collapse = " + ")))
 
-nn <- neuralnet(f, data=train.full,hidden=c(5,3),linear.output=T)
+full<-train.full[,-(1)]
+full<-cbind(train.full[,1]=="-1",full)
+full<-cbind(train.full[,1]=="1",full)
+colnames(full)[1] <- "Y1"
+colnames(full)[2] <- "Y2"
+
+nn <- neuralnet(f, data=full,hidden=c(200,10),linear.output=F,rep=10)
 plot(nn)
-pr.nn <- compute(nn,newFull)
+pr.nn <- compute(nn,newFull[,2:ncol(newFull)])
+rewritedRes<- list(1:nrow(pr.nn$net.result))
+reW<-function(x) {
+  result=1
+  if (x[1]>=0.5){
+    result=-1
+  }
+  return(result)
+}
+table(train.test$Y,apply(pr.nn$net.result, 1, reW))
+
+nn <- neuralnet(f, data=full,hidden=c(200,10),linear.output=F,algorithm="backprop",rep=1000,learningrate = 0.6)
+plot(nn)
+pr.nn <- compute(nn,newFull[,2:ncol(newFull)])
+rewritedRes<- list(1:nrow(pr.nn$net.result))
+reW<-function(x) {
+  result=1
+  if (x[1]>=0.5){
+    result=-1
+  }
+  return(result)
+}
+table(train.test$Y,apply(pr.nn$net.result, 1, reW))
+
