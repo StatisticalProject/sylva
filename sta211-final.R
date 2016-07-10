@@ -43,7 +43,7 @@ ncol(train.quant)
 
 #transforme les variables qualitatives en facteur
 quali <- as.data.frame(lapply(rbind(train.quali,valid.quali), as.factor)) 
-valid.quali <- quali[nrow(train.quali)+1:nrow(valid.quali),]
+valid.quali <- quali[nrow(train.quali)+1:nrow(quali),]
 train.quali <- quali[1:nrow(train.quali),]
 
 #Tableau de burt des variables quantitatives
