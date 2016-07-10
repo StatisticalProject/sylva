@@ -2,6 +2,7 @@
 library(ade4)
 library(lattice)
 library(gridExtra)
+library(FactoMineR)
 #Jeu de donnee SYLVA
 #Chargement des donnees d'entrainement et de validation
 train.data <- read.table("data/sylva_train.data")
@@ -41,7 +42,9 @@ ncol(train.quali)
 ncol(train.quant)
 
 #transforme les variables qualitatives en facteur
-train.quali <- as.data.frame(lapply(train.quali, as.factor)) 
+quali <- as.data.frame(lapply(rbind(train.quali,valid.quali), as.factor)) 
+valid.quali <- quali[nrow(train.quali)+1:nrow(valid.quali),]
+train.quali <- quali[1:nrow(train.quali),]
 
 #Tableau de burt des variables quantitatives
 burtd<-acm.burt(train.quali,train.quali)
@@ -86,5 +89,21 @@ png("eigenvalue.png")
 barplot(train.acm$eig)
 dev.off()
 #Calcul de l'inertie
-inertie<- train.acm$eig/sum(train.acm$eig)*100
-#limite de kaiser
+inertie<- as.data.frame(train.acm$eig/sum(train.acm$eig)*100)
+#critere de kaiser
+kaiserLimit<-100/ncol(train.FullAcm)
+kaiserLimitCol<-ncol(train.FullAcm)
+for(i in 1:nrow(inertie)){
+  if(inertie[i,1]<kaiserLimit)
+  {
+    break
+  }
+  kaiserLimitCol<-i
+}
+
+#Projection des données de test
+valid.suprow<-acm.disjonctif(valid.FullAcm)
+train.suprow<-acm.disjonctif(train.FullAcm)
+colw <- train.acm$cw*ncol(valid.FullAcm)
+valid.suprow <- data.frame(t(t(valid.suprow)/colw) - 1)
+valid.proj<-suprow(train.acm, valid.suprow)
