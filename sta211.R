@@ -89,7 +89,7 @@ table(train.test$Y,Prediction)
 Prediction <- predict(train.rf, train.full)
 table(train.full$Y,Prediction)
 
-n <- names(train.full)
+n <- names(train.full[,1:60])
 f <- as.formula(paste("Y1 + Y2 ~", paste(n[!n %in% "Y"], collapse = " + ")))
 
 full<-train.full[,-(1)]
@@ -98,9 +98,8 @@ full<-cbind(train.full[,1]=="1",full)
 colnames(full)[1] <- "Y1"
 colnames(full)[2] <- "Y2"
 
-nn <- neuralnet(f, data=full,hidden=c(200,10),linear.output=F,rep=10)
-plot(nn)
-pr.nn <- compute(nn,newFull[,2:ncol(newFull)])
+nn <- neuralnet(f, data=full[,1:62],hidden=c(10),linear.output=F,rep=1000)
+pr.nn <- compute(nn,newFull[,2:ncol(newFull)][,1:60])
 rewritedRes<- list(1:nrow(pr.nn$net.result))
 reW<-function(x) {
   result=1
@@ -111,9 +110,7 @@ reW<-function(x) {
 }
 table(train.test$Y,apply(pr.nn$net.result, 1, reW))
 
-nn <- neuralnet(f, data=full,hidden=c(200,10),linear.output=F,algorithm="backprop",rep=1000,learningrate = 0.6)
-plot(nn)
-pr.nn <- compute(nn,newFull[,2:ncol(newFull)])
+pr.nn <- compute(nn,full[,3:ncol(full)])
 rewritedRes<- list(1:nrow(pr.nn$net.result))
 reW<-function(x) {
   result=1
@@ -122,5 +119,5 @@ reW<-function(x) {
   }
   return(result)
 }
-table(train.test$Y,apply(pr.nn$net.result, 1, reW))
+table(train.full$Y,apply(pr.nn$net.result, 1, reW))
 
