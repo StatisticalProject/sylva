@@ -32,7 +32,7 @@ for(i in 1:ncol(train.quali)){
 train.qualAcm<-dudi.acm(train.quali,nf=ncol(train.quali),scannf = FALSE)
 burtd<-acm.burt(train.quali,train.quali)
 image(data.matrix(burtd))
-levelplot(data.matrix(burtd),aspect="iso",pretty=TRUE,xlim=c(1,199), ylim=c(1,199))
+levelplot(data.matrix(burtd),aspect="iso",pretty=TRUE,xlim=c(1,199), ylim=c(1,199),xlab="",ylab="")
 train.qualAcm$cr
 
 library(FactoMineR)
